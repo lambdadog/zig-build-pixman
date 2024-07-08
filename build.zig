@@ -14,8 +14,8 @@ pub fn build(b: *std.Build) !void {
         lib.linkSystemLibrary("pthread");
     }
 
-    lib.addIncludePath(.{ .path = "upstream" });
-    lib.addIncludePath(.{ .path = "include" });
+    lib.addIncludePath(b.path("upstream"));
+    lib.addIncludePath(b.path("include"));
 
     var flags = std.ArrayList([]const u8).init(b.allocator);
     defer flags.deinit();
@@ -39,7 +39,7 @@ pub fn build(b: *std.Build) !void {
         "-fno-sanitize=undefined",
         "-fno-sanitize-trap=undefined",
     });
-    if (!target.isWindows()) {
+    if (target.result.os.tag != .windows) {
         try flags.appendSlice(&.{
             "-DHAVE_PTHREADS=1",
 
@@ -49,11 +49,8 @@ pub fn build(b: *std.Build) !void {
 
     lib.addCSourceFiles(srcs, flags.items);
 
-    lib.installHeader("include/pixman-version.h", "pixman-version.h");
-    lib.installHeadersDirectoryOptions(.{
-        .source_dir = .{ .path = "upstream/pixman" },
-        .install_dir = .header,
-        .install_subdir = "",
+    lib.installHeader(b.path("include/pixman-version.h"), "pixman-version.h");
+    lib.installHeadersDirectory(b.path("upstream/pixman"), "", .{
         .exclude_extensions = &.{
             ".build",
             ".c",
