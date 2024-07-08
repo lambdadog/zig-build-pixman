@@ -47,7 +47,10 @@ pub fn build(b: *std.Build) !void {
         });
     }
 
-    lib.addCSourceFiles(srcs, flags.items);
+    lib.addCSourceFiles(.{
+        .files = srcs,
+        .flags = flags.items,
+    });
 
     lib.installHeader(b.path("include/pixman-version.h"), "pixman-version.h");
     lib.installHeadersDirectory(b.path("upstream/pixman"), "", .{
