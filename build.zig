@@ -10,7 +10,7 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
     lib.linkLibC();
-    if (!target.isWindows()) {
+    if (target.result.os.tag != .windows) {
         lib.linkSystemLibrary("pthread");
     }
 
